@@ -32,3 +32,6 @@ Thumbs.db
 # Large Data Files
 data/ratings.csv
 data/tags.csv
+
+# Trained Models
+models/*.pth
