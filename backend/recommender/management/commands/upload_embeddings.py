@@ -22,10 +22,9 @@ class Command(BaseCommand):
         mapping_path = os.path.join(settings.BASE_DIR, 'models', 'item_map.json')
         
         self.stdout.write("1. Loading Data...")
-        # Load only necessary columns for speed
+
         df = pd.read_csv(ratings_path, usecols=['userId', 'movieId', 'rating'])
         
-        # Create Mappings
         user_ids = df['userId'].unique()
         item_ids = df['movieId'].unique()
         
@@ -41,17 +40,15 @@ class Command(BaseCommand):
         
         self.stdout.write(f"   Users: {num_users}, Items: {num_items}")
         
-        # Save Mapping
         os.makedirs(os.path.dirname(mapping_path), exist_ok=True)
         with open(mapping_path, 'w') as f:
             json.dump({str(k): int(v) for k, v in item2idx.items()}, f)
         self.stdout.write(f"   Mapping saved to {mapping_path}")
 
-        # 2. Train MF Model (or Load)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         if torch.backends.mps.is_available():
             device = torch.device("mps")
-            
+        
         model = MF(num_users, num_items, embed_dim=32).to(device)
         
         if os.path.exists(model_path):
